@@ -4,7 +4,7 @@
 > A estrutura abaixo representa o layout planejado do projeto.
 
 ```text
-ekf-hil-sat/
+ADCS-PIONSAT-UNB/
 │
 ├── src/
 │   ├── firmware/          # Código C/C++ embarcado (EKF, B-dot, drivers)
