@@ -1,0 +1,4 @@
+# Dependências para construir e servir a documentação.
+# Dependências do simulador e da estação de solo devem ser adicionadas
+# quando esses módulos forem implementados.
+mkdocs-material==9.7.6
