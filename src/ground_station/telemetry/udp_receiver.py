@@ -120,3 +120,22 @@ class UdpReceiver(threading.Thread):
                 pass
             finally:
                 self._socket = None
+
+    def is_listening(self) -> bool:
+        """Verifica se o receptor UDP esta escutando."""
+        return self._socket is not None and self._running.is_set()
+
+    def is_connected(self) -> bool:
+        """Alias para is_listening."""
+        return self.is_listening()
+
+    def get_stats(self) -> dict[str, float]:
+        """Retorna snapshot das metricas de recepcao UDP."""
+        with self._lock:
+            return {
+                "packets_received": float(self.packets_received),
+                "crc_errors": float(self.crc_errors),
+                "bytes_received": float(self.bytes_received),
+                "packet_rate_hz": self.packet_rate_hz,
+                "is_connected": 1.0 if self.is_listening() else 0.0,
+            }
