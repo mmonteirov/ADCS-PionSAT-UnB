@@ -1,9 +1,9 @@
 """
 tab_3d_attitude.py
 ==================
-Aba 1: Visao Geral & Atitude 3D em Tempo Real.
-Renderiza o modelo CAD colorido do satelite orientando-se pelos quaternios reais,
-com suporte a ativacao/desativacao do chassi e modo de simulacao integrado.
+Aba 1: Visão Geral & Atitude 3D em Tempo Real.
+Renderiza o modelo CAD colorido do satélite orientando-se pelos quatérnios reais,
+com suporte a ativação/desativação do chassi e modo de simulação integrado.
 """
 
 from __future__ import annotations
@@ -28,7 +28,7 @@ from src.ground_station.ui.style import (
 
 class Tab3DAttitude(QtWidgets.QWidget):
     """
-    Aba 1 da Ground Station: Visualizador 3D do satelite e resumo de atitude.
+    Aba 1 da Ground Station: Visualizador 3D do satélite e resumo de atitude.
     """
 
     request_toggle_mock = QtCore.pyqtSignal(bool)
@@ -52,7 +52,7 @@ class Tab3DAttitude(QtWidgets.QWidget):
         sidebar_layout.setContentsMargins(0, 0, 0, 0)
         sidebar_layout.setSpacing(10)
 
-        # Card: Atitude (Angulos de Euler e Quaternios)
+        # Card: Atitude (Ângulos de Euler e Quatérnios)
         group_attitude = QtWidgets.QGroupBox("ATITUDE ESPACIAL")
         layout_att = QtWidgets.QVBoxLayout(group_attitude)
         layout_att.setSpacing(6)
@@ -89,8 +89,8 @@ class Tab3DAttitude(QtWidgets.QWidget):
 
         sidebar_layout.addWidget(group_attitude)
 
-        # Card: Posicao Relativa na Bancada
-        group_pos = QtWidgets.QGroupBox("POSICAO RELATIVA (BANCADA)")
+        # Card: Posição Relativa na Bancada
+        group_pos = QtWidgets.QGroupBox("POSIÇÃO RELATIVA (BANCADA)")
         layout_pos = QtWidgets.QHBoxLayout(group_pos)
         
         self.val_pos_x = QtWidgets.QLabel("DX: 0 mm")
@@ -146,24 +146,24 @@ class Tab3DAttitude(QtWidgets.QWidget):
 
         sidebar_layout.addWidget(group_status)
 
-        # Card: Controles 3D e Emulacao
-        group_ctrl = QtWidgets.QGroupBox("CONTROLES DE VISUALIZACAO")
+        # Card: Controles 3D e Emulação
+        group_ctrl = QtWidgets.QGroupBox("CONTROLES DE VISUALIZAÇÃO")
         layout_ctrl = QtWidgets.QVBoxLayout(group_ctrl)
         layout_ctrl.setSpacing(8)
 
-        # Botao de Alternar Visibilidade do Chassi
-        self.btn_toggle_chassis = QtWidgets.QPushButton("CHASSI: VISIVEL")
+        # Botão de Alternar Visibilidade do Chassi
+        self.btn_toggle_chassis = QtWidgets.QPushButton("CHASSI: VISÍVEL")
         self.btn_toggle_chassis.setStyleSheet(f"color: {COLOR_ACCENT_CYAN}; font-weight: bold;")
         self.btn_toggle_chassis.clicked.connect(self._on_toggle_chassis)
         layout_ctrl.addWidget(self.btn_toggle_chassis)
 
-        # Botao de Reset de Camera
-        btn_reset_cam = QtWidgets.QPushButton("REINICIAR CAMERA 3D")
+        # Botão de Reset de Câmera
+        btn_reset_cam = QtWidgets.QPushButton("REINICIAR CÂMERA 3D")
         btn_reset_cam.clicked.connect(self.viewport_3d.reset_view)
         layout_ctrl.addWidget(btn_reset_cam)
 
-        # Botao de Emulacao / Simulador
-        self.btn_mock_sim = QtWidgets.QPushButton("ATIVAR EMULACAO / TESTE")
+        # Botão de Emulação / Simulador
+        self.btn_mock_sim = QtWidgets.QPushButton("ATIVAR EMULAÇÃO / TESTE")
         self.btn_mock_sim.setStyleSheet(f"color: {COLOR_WARNING_AMBER}; font-weight: bold;")
         self.btn_mock_sim.clicked.connect(self._on_toggle_mock)
         layout_ctrl.addWidget(self.btn_mock_sim)
@@ -173,10 +173,10 @@ class Tab3DAttitude(QtWidgets.QWidget):
         main_layout.addWidget(sidebar, stretch=1)
 
     def _on_toggle_chassis(self) -> None:
-        """Alterna a exibicao do chassi externo."""
+        """Alterna a exibição do chassi externo."""
         is_vis = self.viewport_3d.toggle_chassis_visibility()
         if is_vis:
-            self.btn_toggle_chassis.setText("CHASSI: VISIVEL")
+            self.btn_toggle_chassis.setText("CHASSI: VISÍVEL")
             self.btn_toggle_chassis.setStyleSheet(f"color: {COLOR_ACCENT_CYAN}; font-weight: bold;")
         else:
             self.btn_toggle_chassis.setText("CHASSI: OCULTO (PILHA INTERNA)")
@@ -189,13 +189,13 @@ class Tab3DAttitude(QtWidgets.QWidget):
         self.request_toggle_mock.emit(self._is_mock_active)
 
     def set_mock_state(self, active: bool) -> None:
-        """Sincroniza o estado visual do botao de emulacao."""
+        """Sincroniza o estado visual do botão de emulação."""
         self._is_mock_active = active
         if active:
-            self.btn_mock_sim.setText("DESATIVAR EMULACAO")
+            self.btn_mock_sim.setText("DESATIVAR EMULAÇÃO")
             self.btn_mock_sim.setStyleSheet(f"color: {COLOR_ALERT_RED}; font-weight: bold;")
         else:
-            self.btn_mock_sim.setText("ATIVAR EMULACAO / TESTE")
+            self.btn_mock_sim.setText("ATIVAR EMULAÇÃO / TESTE")
             self.btn_mock_sim.setStyleSheet(f"color: {COLOR_WARNING_AMBER}; font-weight: bold;")
 
     def update_telemetry(self, packet: TelemetryPacket, stats: Optional[dict[str, float]] = None) -> None:
@@ -210,7 +210,7 @@ class Tab3DAttitude(QtWidgets.QWidget):
             mag_vector_uT=(packet.mag_x, packet.mag_y, packet.mag_z),
         )
 
-        # 2. Angulos de Euler
+        # 2. Ângulos de Euler
         roll, pitch, yaw = packet.euler_angles_deg
         self.val_roll.setText(f"{roll:+6.2f} deg")
         self.val_pitch.setText(f"{pitch:+6.2f} deg")
@@ -220,7 +220,7 @@ class Tab3DAttitude(QtWidgets.QWidget):
             f"Q = [{packet.q_w:+.4f}, {packet.q_x:+.4f}, {packet.q_y:+.4f}, {packet.q_z:+.4f}]"
         )
 
-        # 3. Posicao relativa
+        # 3. Posição relativa
         self.val_pos_x.setText(f"DX: {packet.rel_pos_x:+d} mm")
         self.val_pos_y.setText(f"DY: {packet.rel_pos_y:+d} mm")
         self.val_pos_z.setText(f"DZ: {packet.rel_pos_z:+d} mm")
@@ -237,7 +237,7 @@ class Tab3DAttitude(QtWidgets.QWidget):
             self.bar_soc.setStyleSheet(f"QProgressBar::chunk {{ background-color: {COLOR_NOMINAL_GREEN}; }}")
 
         # 5. Modos e Status
-        modes_map = {0: "IDLE", 1: "B-DOT", 2: "POINTING", 3: "CALIB"}
+        modes_map = {0: "IDLE", 1: "B-DOT", 2: "POINTING", 3: "CALIBRAÇÃO"}
         self.val_mode.setText(modes_map.get(packet.sys_mode, f"MODO {packet.sys_mode}"))
 
         ekf_map = {0: "INIT", 1: "DIVERGENTE", 2: "CONVERGIDO"}

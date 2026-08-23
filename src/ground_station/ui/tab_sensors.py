@@ -2,7 +2,7 @@
 tab_sensors.py
 ==============
 Aba 2: Sensores Ambientais & Housekeeping do PION Sat.
-Monitoramento em tempo real de Bateria (V, mA, mW, SoC%), CO2 (ppm), Luz (Lux), Umidade (%RH) e Pressao (hPa).
+Monitoramento em tempo real de Bateria (V, mA, mW, SoC%), CO2 (ppm), Luz (Lux), Umidade (%RH) e Pressão (hPa).
 """
 
 from __future__ import annotations
@@ -30,7 +30,7 @@ MAX_PLOT_POINTS = 200
 
 
 def create_metric_card(title: str, unit: str = "") -> tuple[QtWidgets.QFrame, QtWidgets.QLabel, QtWidgets.QLabel]:
-    """Cria um card visual de sensor com rotulo, valor grande e status."""
+    """Cria um card visual de sensor com rótulo, valor grande e status."""
     frame = QtWidgets.QFrame()
     frame.setStyleSheet(f"""
         QFrame {{
@@ -93,7 +93,7 @@ class TabSensors(QtWidgets.QWidget):
         cards_layout.addWidget(self.card_bat)
 
         # Card CO2
-        self.card_co2, self.val_co2, self.sub_co2 = create_metric_card("Dioxido de Carbono", "ppm")
+        self.card_co2, self.val_co2, self.sub_co2 = create_metric_card("Dióxido de Carbono", "ppm")
         cards_layout.addWidget(self.card_co2)
 
         # Card Luz
@@ -104,36 +104,36 @@ class TabSensors(QtWidgets.QWidget):
         self.card_hum, self.val_hum, self.sub_hum = create_metric_card("Umidade Relativa", "% RH")
         cards_layout.addWidget(self.card_hum)
 
-        # Card Pressao
-        self.card_press, self.val_press, self.sub_press = create_metric_card("Pressao Atmosferica", "hPa")
+        # Card Pressão
+        self.card_press, self.val_press, self.sub_press = create_metric_card("Pressão Atmosférica", "hPa")
         cards_layout.addWidget(self.card_press)
 
         main_layout.addLayout(cards_layout)
 
-        # 2. Grade de Graficos Temporais (PyQtGraph)
+        # 2. Grade de Gráficos Temporais (PyQtGraph)
         pg.setConfigOptions(antialias=True)
         plots_grid = QtWidgets.QGridLayout()
         plots_grid.setSpacing(10)
 
-        # Grafico 1: Bateria (Tensao & Potencia)
+        # Gráfico 1: Bateria (Tensão & Potência)
         self.plot_bat = pg.PlotWidget(title="PERFIL DE ENERGIA (BATERIA)")
         self.plot_bat.setBackground(COLOR_BG_PANEL)
         self.plot_bat.showGrid(x=True, y=True, alpha=0.2)
-        self.plot_bat.setLabel("left", "Tensao (V)", color=COLOR_NOMINAL_GREEN)
+        self.plot_bat.setLabel("left", "Tensão (V)", color=COLOR_NOMINAL_GREEN)
         self.plot_bat.setLabel("bottom", "Amostras", color=COLOR_TEXT_MUTED)
-        self.curve_vbat = self.plot_bat.plot(pen=pg.mkPen(COLOR_NOMINAL_GREEN, width=2), name="Tensao (V)")
+        self.curve_vbat = self.plot_bat.plot(pen=pg.mkPen(COLOR_NOMINAL_GREEN, width=2), name="Tensão (V)")
         plots_grid.addWidget(self.plot_bat, 0, 0)
 
-        # Grafico 2: CO2
-        self.plot_co2 = pg.PlotWidget(title="CONCENTRACAO DE CO2 (PPM)")
+        # Gráfico 2: CO2
+        self.plot_co2 = pg.PlotWidget(title="CONCENTRAÇÃO DE CO₂ (PPM)")
         self.plot_co2.setBackground(COLOR_BG_PANEL)
         self.plot_co2.showGrid(x=True, y=True, alpha=0.2)
-        self.plot_co2.setLabel("left", "CO2 (ppm)", color=COLOR_ACCENT_CYAN)
+        self.plot_co2.setLabel("left", "CO₂ (ppm)", color=COLOR_ACCENT_CYAN)
         self.plot_co2.setLabel("bottom", "Amostras", color=COLOR_TEXT_MUTED)
-        self.curve_co2 = self.plot_co2.plot(pen=pg.mkPen(COLOR_ACCENT_CYAN, width=2), name="CO2")
+        self.curve_co2 = self.plot_co2.plot(pen=pg.mkPen(COLOR_ACCENT_CYAN, width=2), name="CO₂")
         plots_grid.addWidget(self.plot_co2, 0, 1)
 
-        # Grafico 3: Luminosidade (Lux)
+        # Gráfico 3: Luminosidade (Lux)
         self.plot_lux = pg.PlotWidget(title="INTENSIDADE LUMINOSA (LUX)")
         self.plot_lux.setBackground(COLOR_BG_PANEL)
         self.plot_lux.showGrid(x=True, y=True, alpha=0.2)
@@ -142,8 +142,8 @@ class TabSensors(QtWidgets.QWidget):
         self.curve_lux = self.plot_lux.plot(pen=pg.mkPen(COLOR_WARNING_AMBER, width=2), name="Luz (Lux)")
         plots_grid.addWidget(self.plot_lux, 1, 0)
 
-        # Grafico 4: Umidade & Pressao
-        self.plot_climate = pg.PlotWidget(title="CLIMATOLOGIA (UMIDADE & PRESSAO)")
+        # Gráfico 4: Umidade & Pressão
+        self.plot_climate = pg.PlotWidget(title="CLIMATOLOGIA (UMIDADE & PRESSÃO)")
         self.plot_climate.setBackground(COLOR_BG_PANEL)
         self.plot_climate.showGrid(x=True, y=True, alpha=0.2)
         self.plot_climate.setLabel("left", "Umidade (% RH)", color="#a78bfa")
@@ -154,14 +154,14 @@ class TabSensors(QtWidgets.QWidget):
         main_layout.addLayout(plots_grid, stretch=1)
 
     def update_telemetry(self, packet: TelemetryPacket) -> None:
-        """Atualiza os cards e adiciona pontos aos graficos temporais."""
-        # 1. Atualizacao dos Cards
+        """Atualiza os cards e adiciona pontos aos gráficos temporais."""
+        # 1. Atualização dos Cards
         v_bat = packet.v_bat_v
         i_bat = packet.i_bat_ma
         p_bat = packet.p_bat_mw
         soc = packet.soc_percent
         self.val_bat.setText(f"{v_bat:.2f} V ({soc}%)")
-        self.sub_bat.setText(f"Corrente: {i_bat:+d} mA | Potencia: {p_bat:.1f} mW")
+        self.sub_bat.setText(f"Corrente: {i_bat:+d} mA | Potência: {p_bat:.1f} mW")
         if soc < 20:
             self.val_bat.setStyleSheet(f"color: {COLOR_ALERT_RED}; font-size: 20px; font-weight: bold;")
         elif soc < 50:
@@ -178,22 +178,22 @@ class TabSensors(QtWidgets.QWidget):
             self.sub_co2.setText("Faixa Moderada")
             self.val_co2.setStyleSheet(f"color: {COLOR_WARNING_AMBER}; font-size: 20px; font-weight: bold;")
         else:
-            self.sub_co2.setText("Concentracao Alta / Alerta")
+            self.sub_co2.setText("Concentração Alta / Alerta")
             self.val_co2.setStyleSheet(f"color: {COLOR_ALERT_RED}; font-size: 20px; font-weight: bold;")
 
         # Luz
         self.val_lux.setText(f"{packet.light_lux} Lux")
-        self.sub_lux.setText(f"Radiacao incidente: {packet.light_lux / 100.0:.1f} W/m2 eq.")
+        self.sub_lux.setText(f"Radiação incidente: {packet.light_lux / 100.0:.1f} W/m² eq.")
 
         # Umidade
         self.val_hum.setText(f"{packet.humidity_pct:.1f} %")
-        self.sub_hum.setText(f"Raw ADC: {packet.humidity_raw}")
+        self.sub_hum.setText(f"ADC Bruto: {packet.humidity_raw}")
 
-        # Pressao
+        # Pressão
         self.val_press.setText(f"{packet.pressure_hpa:.1f} hPa")
         self.sub_press.setText(f"Absoluta: {packet.pressure_pa:.0f} Pa")
 
-        # 2. Atualizacao dos Buffers
+        # 2. Atualização dos Buffers
         self.vbat_buffer.append(v_bat)
         self.pbat_buffer.append(p_bat)
         self.co2_buffer.append(packet.co2_ppm)
@@ -201,7 +201,7 @@ class TabSensors(QtWidgets.QWidget):
         self.hum_buffer.append(packet.humidity_pct)
         self.press_buffer.append(packet.pressure_hpa)
 
-        # 3. Atualizacao das Curvas
+        # 3. Atualização das Curvas
         self.curve_vbat.setData(list(self.vbat_buffer))
         self.curve_co2.setData(list(self.co2_buffer))
         self.curve_lux.setData(list(self.lux_buffer))

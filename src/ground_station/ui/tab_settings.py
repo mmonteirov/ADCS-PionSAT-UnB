@@ -1,7 +1,7 @@
 """
 tab_settings.py
 ===============
-Aba 5: Gerenciador de Conexao Serial USB, Gravacao de Telemetria e Configuracoes.
+Aba 5: Gerenciador de Conexão Serial USB, Gravação de Telemetria e Configurações.
 """
 
 from __future__ import annotations
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 class TabSettings(QtWidgets.QWidget):
     """
-    Aba 5 da Ground Station: Gerenciador de comunicacao serial e gravacao de dados.
+    Aba 5 da Ground Station: Gerenciador de comunicação serial e gravação de dados.
     """
 
     # Sinais emitidos para a janela principal
@@ -47,8 +47,8 @@ class TabSettings(QtWidgets.QWidget):
         main_layout.setContentsMargins(16, 16, 16, 16)
         main_layout.setSpacing(16)
 
-        # 1. Grupo Conexao Serial USB
-        group_serial = QtWidgets.QGroupBox("CONEXAO SERIAL / USB")
+        # 1. Grupo Conexão Serial USB
+        group_serial = QtWidgets.QGroupBox("CONEXÃO SERIAL / USB")
         l_serial = QtWidgets.QGridLayout(group_serial)
         l_serial.setSpacing(10)
 
@@ -60,7 +60,7 @@ class TabSettings(QtWidgets.QWidget):
         self.btn_refresh.clicked.connect(self.refresh_ports)
         l_serial.addWidget(self.btn_refresh, 0, 2)
 
-        l_serial.addWidget(QtWidgets.QLabel("BAUDRATE:"), 1, 0)
+        l_serial.addWidget(QtWidgets.QLabel("TAXA (BAUDRATE):"), 1, 0)
         self.combo_baud = QtWidgets.QComboBox()
         self.combo_baud.addItems(["115200", "921600", "57600", "230400", "460800"])
         self.combo_baud.setCurrentText("115200")
@@ -77,33 +77,33 @@ class TabSettings(QtWidgets.QWidget):
 
         main_layout.addWidget(group_serial)
 
-        # 2. Grupo Gravacao de Telemetria (CSV)
-        group_logging = QtWidgets.QGroupBox("GRAVACAO DE SESSAO (CSV)")
+        # 2. Grupo Gravação de Telemetria (CSV)
+        group_logging = QtWidgets.QGroupBox("GRAVAÇÃO DE SESSÃO (CSV)")
         l_log = QtWidgets.QGridLayout(group_logging)
         l_log.setSpacing(10)
 
         l_log.addWidget(QtWidgets.QLabel("NOME DO ARQUIVO:"), 0, 0)
         self.edit_log_name = QtWidgets.QLineEdit()
-        self.edit_log_name.setPlaceholderText("Deixe em branco para timestamp automatico")
+        self.edit_log_name.setPlaceholderText("Deixe em branco para carimbo de data/hora automático")
         l_log.addWidget(self.edit_log_name, 0, 1)
 
-        self.btn_toggle_log = QtWidgets.QPushButton("INICIAR GRAVACAO")
+        self.btn_toggle_log = QtWidgets.QPushButton("INICIAR GRAVAÇÃO")
         self.btn_toggle_log.setStyleSheet(f"color: {COLOR_ACCENT_CYAN}; font-weight: bold;")
         self.btn_toggle_log.clicked.connect(self._on_toggle_log)
         l_log.addWidget(self.btn_toggle_log, 0, 2)
 
-        self.lbl_log_status = QtWidgets.QLabel("GRAVACAO: INATIVA (0 pacotes gravados)")
+        self.lbl_log_status = QtWidgets.QLabel("GRAVAÇÃO: INATIVA (0 pacotes gravados)")
         self.lbl_log_status.setStyleSheet(f"color: {COLOR_TEXT_MUTED};")
         l_log.addWidget(self.lbl_log_status, 1, 0, 1, 3)
 
         main_layout.addWidget(group_logging)
 
-        # 3. Grupo Telecomandos & Calibracao
-        group_cmd = QtWidgets.QGroupBox("CALIBRACAO & COMANDOS OPERACIONAIS")
+        # 3. Grupo Telecomandos & Calibração
+        group_cmd = QtWidgets.QGroupBox("CALIBRAÇÃO & COMANDOS OPERACIONAIS")
         l_cmd = QtWidgets.QHBoxLayout(group_cmd)
         l_cmd.setSpacing(10)
 
-        btn_reset_twin = QtWidgets.QPushButton("REINICIAR FILTROS / GEMEO")
+        btn_reset_twin = QtWidgets.QPushButton("REINICIAR FILTROS / GÊMEO DIGITAL")
         btn_reset_twin.clicked.connect(lambda: self.request_reset_twin.emit())
         l_cmd.addWidget(btn_reset_twin)
 
@@ -138,7 +138,7 @@ class TabSettings(QtWidgets.QWidget):
             self.request_disconnect.emit()
 
     def set_connected_state(self, connected: bool, port: str = "", baud: int = 115200) -> None:
-        """Atualiza o estado visual da interface de conexao."""
+        """Atualiza o estado visual da interface de conexão."""
         if connected:
             self.btn_toggle_connect.setText("DESCONECTAR")
             self.btn_toggle_connect.setStyleSheet(f"color: {COLOR_ALERT_RED}; font-weight: bold;")
@@ -157,23 +157,23 @@ class TabSettings(QtWidgets.QWidget):
             self.btn_refresh.setEnabled(True)
 
     def _on_toggle_log(self) -> None:
-        if self.btn_toggle_log.text() == "INICIAR GRAVACAO":
+        if "INICIAR" in self.btn_toggle_log.text():
             custom_name = self.edit_log_name.text().strip() or None
             self.request_start_logging.emit(custom_name or "")
         else:
             self.request_stop_logging.emit()
 
     def set_logging_state(self, is_logging: bool, filepath: str = "", count: int = 0) -> None:
-        """Atualiza o estado visual da gravacao CSV."""
+        """Atualiza o estado visual da gravação CSV."""
         if is_logging:
-            self.btn_toggle_log.setText("PARAR GRAVACAO")
+            self.btn_toggle_log.setText("PARAR GRAVAÇÃO")
             self.btn_toggle_log.setStyleSheet(f"color: {COLOR_ALERT_RED}; font-weight: bold;")
             self.lbl_log_status.setText(f"GRAVANDO: {filepath} ({count} pacotes)")
             self.lbl_log_status.setStyleSheet(f"color: {COLOR_NOMINAL_GREEN}; font-weight: bold;")
             self.edit_log_name.setEnabled(False)
         else:
-            self.btn_toggle_log.setText("INICIAR GRAVACAO")
+            self.btn_toggle_log.setText("INICIAR GRAVAÇÃO")
             self.btn_toggle_log.setStyleSheet(f"color: {COLOR_ACCENT_CYAN}; font-weight: bold;")
-            self.lbl_log_status.setText(f"GRAVACAO: INATIVA (Ultima sessao: {count} pacotes)")
+            self.lbl_log_status.setText(f"GRAVAÇÃO: INATIVA (Última sessão: {count} pacotes)")
             self.lbl_log_status.setStyleSheet(f"color: {COLOR_TEXT_MUTED};")
             self.edit_log_name.setEnabled(True)

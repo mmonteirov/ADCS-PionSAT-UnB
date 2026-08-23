@@ -74,11 +74,11 @@ class GroundStationMainWindow(QtWidgets.QMainWindow):
         self.tab_divergence = TabDivergence(self)
         self.tab_settings = TabSettings(self)
 
-        self.tab_widget.addTab(self.tab_3d, "ABA 1 — VISAO GERAL & ATITUDE 3D")
-        self.tab_widget.addTab(self.tab_sensors, "ABA 2 — SENSORES AMBIENTAIS & HOUSEKEEPING")
-        self.tab_widget.addTab(self.tab_adcs, "ABA 3 — TELEMETRIA ADCS & DINAMICA")
-        self.tab_widget.addTab(self.tab_divergence, "ABA 4 — GEMEO DIGITAL & DIVERGENCIA")
-        self.tab_widget.addTab(self.tab_settings, "ABA 5 — CONEXAO SERIAL & CONFIGURACOES")
+        self.tab_widget.addTab(self.tab_3d, "Atitude & 3D")
+        self.tab_widget.addTab(self.tab_sensors, "Sensores & Bateria")
+        self.tab_widget.addTab(self.tab_adcs, "Dinâmica & ADCS")
+        self.tab_widget.addTab(self.tab_divergence, "Gêmeo Digital (DTiL)")
+        self.tab_widget.addTab(self.tab_settings, "Conexão & Logs")
 
         # 2. Conexao de sinais das Abas
         self.tab_settings.request_connect.connect(self.connect_serial)
