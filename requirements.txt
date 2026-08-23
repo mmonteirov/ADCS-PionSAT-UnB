@@ -1,4 +1,10 @@
-# Dependências para construir e servir a documentação.
-# Dependências do simulador e da estação de solo devem ser adicionadas
-# quando esses módulos forem implementados.
-mkdocs-material==9.7.6
+# Dependencias da Ground Station, Gemeo Digital (DTiL) e Documentacao
+PyQt6>=6.5.0
+pyqtgraph>=0.13.0
+PyOpenGL>=3.1.0
+numpy>=1.24.0
+scipy>=1.10.0
+pyserial>=3.5
+trimesh>=4.0.0
+pytest>=7.4.0
+mkdocs-material>=9.5.0

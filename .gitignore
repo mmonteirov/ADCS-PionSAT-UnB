@@ -54,7 +54,9 @@ Thumbs.db
 Desktop.ini
 
 # Logs e arquivos temporários
+logs/
 *.log
 *.tmp
 *.temp
 *~
+*.npz
