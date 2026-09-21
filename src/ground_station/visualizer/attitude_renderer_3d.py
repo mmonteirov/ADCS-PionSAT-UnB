@@ -14,6 +14,7 @@ from typing import Optional, Tuple, Dict, Any
 
 import numpy as np
 from PyQt6 import QtWidgets, QtCore, QtGui
+from pyqtgraph import Transform3D
 import pyqtgraph.opengl as gl
 
 from src.ground_station.visualizer.cad_loader import (
@@ -71,7 +72,12 @@ class AttitudeRenderer3D(gl.GLViewWidget):
 
         self.cha_base_v = cad_dual["chassis_vertices"]
         self.cha_faces = cad_dual["chassis_faces"]
-        self.cha_colors = cad_dual["chassis_colors"]
+        # Transparencia em uma malha CAD complexa provoca artefatos de ordem de
+        # desenho (faces aparecem e desaparecem durante a rotacao). O chassi
+        # possui um controle proprio de visibilidade, portanto mantemo-lo opaco.
+        self.cha_colors = cad_dual["chassis_colors"].copy()
+        if len(self.cha_colors) > 0:
+            self.cha_colors[:, 3] = 1.0
 
         # Item de malha da Pilha Interna (PCBs, Bateria, Pilares)
         self.internal_mesh_item = gl.GLMeshItem(
@@ -91,7 +97,7 @@ class AttitudeRenderer3D(gl.GLViewWidget):
             faceColors=self.cha_colors,
             smooth=False,
             shader="shaded",
-            glOptions="translucent",
+            glOptions="opaque",
         )
         self.addItem(self.chassis_mesh_item)
         self.chassis_visible = True
@@ -156,25 +162,16 @@ class AttitudeRenderer3D(gl.GLViewWidget):
         else:
             pos_offset = np.array(self.current_pos_mm, dtype=np.float32)
 
-        # 1. Rotaciona e translada os vertices da Pilha Interna
-        if len(self.int_base_v) > 0:
-            rot_int_v = np.dot(self.int_base_v, R.T) + pos_offset
-            self.internal_mesh_item.setMeshData(
-                vertexes=rot_int_v,
-                faces=self.int_faces,
-                faceColors=self.int_colors,
-                smooth=False,
-            )
-
-        # 2. Rotaciona e translada os vertices do Chassi
-        if self.chassis_visible and len(self.cha_base_v) > 0:
-            rot_cha_v = np.dot(self.cha_base_v, R.T) + pos_offset
-            self.chassis_mesh_item.setMeshData(
-                vertexes=rot_cha_v,
-                faces=self.cha_faces,
-                faceColors=self.cha_colors,
-                smooth=False,
-            )
+        # 1/2. Atualiza somente a matriz de modelo. Recriar todos os vertices e
+        # buffers OpenGL a cada pacote causava cintilacao no modelo CAD.
+        transform = Transform3D([
+            [R[0, 0], R[0, 1], R[0, 2], pos_offset[0]],
+            [R[1, 0], R[1, 1], R[1, 2], pos_offset[1]],
+            [R[2, 0], R[2, 1], R[2, 2], pos_offset[2]],
+            [0.0, 0.0, 0.0, 1.0],
+        ])
+        self.internal_mesh_item.setTransform(transform)
+        self.chassis_mesh_item.setTransform(transform)
 
         # 3. Eixos de corpo
         origin = pos_offset

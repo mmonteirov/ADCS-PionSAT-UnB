@@ -91,6 +91,7 @@ class GroundStationMainWindow(QtWidgets.QMainWindow):
         # Thread de emulacao dinamica
         self._mock_thread: Optional[threading.Thread] = None
         self._mock_running = threading.Event()
+        self._serial_before_mock: Optional[tuple[str, int]] = None
 
         # 3. Barra de Status
         self.status_bar = self.statusBar()
@@ -125,9 +126,17 @@ class GroundStationMainWindow(QtWidgets.QMainWindow):
             self.toggle_mock_mode(True)
 
     def toggle_mock_mode(self, active: bool) -> None:
-        """Ativa ou desativa a injecao continua de telemetria simulada."""
+        """Alterna entre telemetria real e simulada sem misturar as fontes."""
         if active:
             if not self._mock_running.is_set():
+                if self.serial_receiver is not None:
+                    self._serial_before_mock = (
+                        self.serial_receiver.port,
+                        self.serial_receiver.baudrate,
+                    )
+                    self.disconnect_serial()
+
+                self._drain_packet_queue()
                 self._mock_running.set()
                 from src.ground_station.telemetry.mock_sender import MockTelemetryGenerator
                 generator = MockTelemetryGenerator(freq_hz=20.0)
@@ -152,17 +161,31 @@ class GroundStationMainWindow(QtWidgets.QMainWindow):
                 logger.info("Emulador de telemetria ativado via interface grafica.")
         else:
             self._mock_running.clear()
-            # Esvazia completamente a fila de pacotes acumulada
-            while not self.packet_queue.empty():
-                try:
-                    self.packet_queue.get_nowait()
-                except Exception:
-                    break
+            if self._mock_thread is not None:
+                self._mock_thread.join(timeout=1.0)
+                self._mock_thread = None
+
+            self._drain_packet_queue()
             self.tab_3d.set_mock_state(False)
-            self.lbl_status_link.setText("LINK: DESCONECTADO")
-            self.lbl_status_link.setStyleSheet("color: #8295b0; font-weight: bold; padding: 0 10px;")
             self.lbl_status_rate.setText("TAXA: 0.0 Hz")
             logger.info("Emulador de telemetria desativado.")
+
+            previous_serial = self._serial_before_mock
+            self._serial_before_mock = None
+            if previous_serial is not None:
+                port, baudrate = previous_serial
+                self.connect_serial(port, baudrate)
+            else:
+                self.lbl_status_link.setText("LINK: DESCONECTADO")
+                self.lbl_status_link.setStyleSheet("color: #8295b0; font-weight: bold; padding: 0 10px;")
+
+    def _drain_packet_queue(self) -> None:
+        """Descarta pacotes antigos ao trocar a fonte de telemetria."""
+        while True:
+            try:
+                self.packet_queue.get_nowait()
+            except queue.Empty:
+                break
 
     def connect_serial(self, port: str, baudrate: int = 115200) -> None:
         """Inicia a thread do receptor serial."""

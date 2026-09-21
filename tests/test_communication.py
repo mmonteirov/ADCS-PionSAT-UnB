@@ -77,3 +77,29 @@ def test_udp_receiver_invalid_packets_rejection():
     assert pkt_queue.empty()
     stats = receiver.get_stats()
     assert stats["crc_errors"] >= 1
+
+
+def test_mock_magnetic_vector_is_fixed_in_lab_frame():
+    """A emulacao deve girar o satelite, nao o campo magnetico da sala."""
+    generator = MockTelemetryGenerator(freq_hz=20.0)
+
+    for _ in range(200):
+        pkt = generator.generate_next_packet()
+        qw, qx, qy, qz = pkt.q_w, pkt.q_x, pkt.q_y, pkt.q_z
+
+        r00 = 1.0 - 2.0 * (qy * qy + qz * qz)
+        r01 = 2.0 * (qx * qy - qz * qw)
+        r02 = 2.0 * (qx * qz + qy * qw)
+        r10 = 2.0 * (qx * qy + qz * qw)
+        r11 = 1.0 - 2.0 * (qx * qx + qz * qz)
+        r12 = 2.0 * (qy * qz - qx * qw)
+        r20 = 2.0 * (qx * qz - qy * qw)
+        r21 = 2.0 * (qy * qz + qx * qw)
+        r22 = 1.0 - 2.0 * (qx * qx + qy * qy)
+
+        b_lab = (
+            r00 * pkt.mag_x + r01 * pkt.mag_y + r02 * pkt.mag_z,
+            r10 * pkt.mag_x + r11 * pkt.mag_y + r12 * pkt.mag_z,
+            r20 * pkt.mag_x + r21 * pkt.mag_y + r22 * pkt.mag_z,
+        )
+        assert b_lab == pytest.approx((14.5, -2.5, -19.5), abs=1e-5)

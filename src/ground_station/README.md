@@ -2,6 +2,11 @@
 
 Aplicação desktop em **PyQt6** com visualizador 3D OpenGL, ingestão serial USB / UDP de alta taxa e integração direta com o motor do Gêmeo Digital.
 
+O modo de emulação é isolado da porta serial: ao ativá-lo, a conexão física é
+temporariamente interrompida e restaurada ao sair da emulação. Isso impede a
+mistura de pacotes reais e simulados. O modelo 3D usa transformação de cena em
+vez de reconstruir a malha a cada pacote, evitando cintilação durante a rotação.
+
 ---
 
 ## Estrutura do Pacote

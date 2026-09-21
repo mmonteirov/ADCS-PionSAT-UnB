@@ -86,10 +86,24 @@ class MockTelemetryGenerator:
             qy /= q_norm
             qz /= q_norm
 
-        # Campo magnetico em Body Frame (uT)
-        mag_x = 14.5 * math.cos(self.angle_z) - 2.5 * math.sin(self.angle_z) + random.gauss(0, 0.15)
-        mag_y = 14.5 * math.sin(self.angle_z) + 2.5 * math.cos(self.angle_z) + random.gauss(0, 0.15)
-        mag_z = -19.5 + random.gauss(0, 0.10)
+        # Campo magnetico fixo no referencial do laboratorio, convertido para
+        # Body Frame por B_body = R(q)^T B_lab. O renderizador aplica R(q) de
+        # volta; assim, a linha amarela permanece estatica enquanto o CubeSat
+        # simulado gira. Sem ruido aqui para servir como referencia visual.
+        r00 = 1.0 - 2.0 * (qy * qy + qz * qz)
+        r01 = 2.0 * (qx * qy - qz * qw)
+        r02 = 2.0 * (qx * qz + qy * qw)
+        r10 = 2.0 * (qx * qy + qz * qw)
+        r11 = 1.0 - 2.0 * (qx * qx + qz * qz)
+        r12 = 2.0 * (qy * qz - qx * qw)
+        r20 = 2.0 * (qx * qz - qy * qw)
+        r21 = 2.0 * (qy * qz + qx * qw)
+        r22 = 1.0 - 2.0 * (qx * qx + qy * qy)
+
+        b_lab_x, b_lab_y, b_lab_z = 14.5, -2.5, -19.5
+        mag_x = r00 * b_lab_x + r10 * b_lab_y + r20 * b_lab_z
+        mag_y = r01 * b_lab_x + r11 * b_lab_y + r21 * b_lab_z
+        mag_z = r02 * b_lab_x + r12 * b_lab_y + r22 * b_lab_z
 
         # Variacoes estocasticas continuas (Random walk suave)
         self.co2_ppm = max(400.0, min(500.0, self.co2_ppm + random.gauss(0, 0.2)))

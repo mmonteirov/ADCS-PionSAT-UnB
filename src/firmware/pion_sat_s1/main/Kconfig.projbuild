@@ -1,0 +1,33 @@
+menu "PION Sat ADCS"
+
+config PION_IMU_SIMULATION
+    bool "Usar IMU simulada em repouso"
+    default y
+    help
+        Publica aceleracao [0, 0, 9.80665] m/s2 e giroscopio zerado.
+        Desative somente depois de implementar e validar a IMU fisica.
+
+config PION_I2C_SDA_GPIO
+    int "GPIO SDA do I2C"
+    range 0 39
+    default 21
+
+config PION_I2C_SCL_GPIO
+    int "GPIO SCL do I2C"
+    range 0 39
+    default 22
+
+config PION_ACTUATOR_ENABLED
+    bool "Permitir inicializacao do atuador fisico"
+    default n
+    help
+        Mantenha desativado ate confirmar driver, pinos e limites eletricos.
+
+config PION_BINARY_TELEMETRY
+    bool "Transmitir telemetria binaria ICD v1.2 pela UART0"
+    default y
+    help
+        Envia pacotes little-endian de 76 bytes a 20 Hz, com CRC-16-CCITT,
+        compativeis com a Ground Station do repositorio ADCS-PionSAT-UnB.
+
+endmenu

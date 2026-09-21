@@ -56,8 +56,10 @@ Para responder experimentalmente, a plataforma educacional PION Sat é equipada 
 git clone https://github.com/seu-org/ekf-hil-sat.git
 cd ekf-hil-sat
 
-# Firmware (requer PlatformIO ou ESP-IDF)
-cd src/firmware && pio run
+# Firmware S1 (requer ESP-IDF 5.2/5.3)
+cd src/firmware/pion_sat_s1
+idf.py set-target esp32
+idf.py build
 
 # Ground Station
 cd src/ground_station && pip install -r requirements.txt && python main.py
@@ -76,6 +78,8 @@ cd sim && python propagator/run_simulation.py
 |---|---|
 | [Arquitetura](docs/arquitetura.md) | Estrutura do repositório e descrição dos módulos |
 | [Setup](docs/setup.md) | Pré-requisitos e configuração completa do ambiente |
+| [Firmware S1](src/firmware/pion_sat_s1/README.md) | ESP-IDF, FreeRTOS, MPU-9250/AK8963, EKF e telemetria binária |
+| [Testes do firmware](src/firmware/pion_sat_s1/TESTES.md) | Evidências, compatibilidade com a Ground Station e limitações atuais |
 | [Roadmap](docs/roadmap.md) | Cronograma e fases do projeto |
 | [Equipe](docs/equipe.md) | Frentes de trabalho e responsabilidades |
 | [Referências](docs/referencias.md) | Bibliografia e fontes técnicas |
